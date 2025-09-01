@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SDE + ML Master Planner</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      background: #f5f7fa;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      padding: 20px;
+      background: #1f2937;
+      color: white;
+      margin: 0;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      background: #e5e7eb;
+      border-bottom: 2px solid #ccc;
+    }
+    .tabs button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      cursor: pointer;
+      background: #e5e7eb;
+      font-weight: bold;
+    }
+    .tabs button.active {
+      background: #1f2937;
+      color: white;
+    }
+    .tab-content {
+      display: none;
+      padding: 20px;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .progress-container {
+      background: #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 10px 0 20px;
+    }
+    .progress-bar {
+      height: 20px;
+      background: #10b981;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    ul { list-style: none; padding: 0; }
+    li { margin: 8px 0; }
+  </style>
+</head>
+<body>
+
+<h1>SDE + ML Master Planner (Sept–Dec 2025)</h1>
+
+<div class="tabs" id="tabs"></div>
+
+<div id="tab-contents"></div>
+
+<script>
+const threads = [
+  {
+    id: "dsa",
+    title: "DSA & Competitive Programming",
+    checklist: [
+      "Arrays → Strings → Recursion → Hashing → Trees → Graphs → DP → Advanced",
+      "Daily LC (Easy→Medium→Hard)",
+      "500+ problems by Dec",
+      "Weekly Codeforces/CodeChef contests"
+    ],
+    milestones: {
+      Sept: "Arrays, Strings, Recursion (100 LC problems)",
+      Oct: "Hashing, Trees, Graphs (200 LC problems)",
+      Nov: "DP + Advanced topics (350 LC problems)",
+      Dec: "Final push to 500+ problems + mock contests"
+    }
+  },
+  {
+    id: "os",
+    title: "Operating Systems",
+    checklist: [
+      "Scheduling algorithms",
+      "Concurrency & synchronization",
+      "Deadlocks (avoidance + detection)",
+      "Memory management (paging, segmentation, virtual memory)"
+    ],
+    milestones: {
+      Sept: "Scheduling + Concurrency basics",
+      Oct: "Deadlocks deep dive",
+      Nov: "Memory management",
+      Dec: "Full OS revision + mock Qs"
+    }
+  },
+  {
+    id: "dbms",
+    title: "DBMS",
+    checklist: [
+      "Transactions & ACID properties",
+      "Indexing & Query Optimization",
+      "SQL Joins & Subqueries",
+      "NoSQL basics"
+    ],
+    milestones: {
+      Sept: "SQL basics + queries",
+      Oct: "Transactions & Indexing",
+      Nov: "Query Optimization + NoSQL",
+      Dec: "DBMS full revision"
+    }
+  },
+  {
+    id: "cn",
+    title: "Computer Networks",
+    checklist: [
+      "TCP vs UDP",
+      "Routing algorithms",
+      "DNS, DHCP",
+      "HTTP/HTTPS + TLS"
+    ],
+    milestones: {
+      Sept: "TCP/UDP basics",
+      Oct: "Routing + DNS",
+      Nov: "HTTP/HTTPS + TLS",
+      Dec: "CN full revision + mock"
+    }
+  },
+  {
+    id: "oop",
+    title: "OOP & Design Patterns",
+    checklist: [
+      "Encapsulation, Abstraction, Polymorphism",
+      "MVC Architecture",
+      "Singleton, Factory patterns",
+      "Observer, Strategy, Adapter patterns"
+    ],
+    milestones: {
+      Sept: "Core OOP concepts",
+      Oct: "MVC + basic patterns",
+      Nov: "Advanced patterns",
+      Dec: "OOP interview prep"
+    }
+  },
+  {
+    id: "systemdesign",
+    title: "System Design",
+    checklist: [
+      "LLD: Classes, relationships, APIs",
+      "HLD: Scalability, caching, load balancing, sharding",
+      "Case Studies: WhatsApp, Uber, Instagram, TinyURL",
+      "Weekly case study practice"
+    ],
+    milestones: {
+      Sept: "LLD basics",
+      Oct: "HLD concepts",
+      Nov: "Case studies (WhatsApp, Uber)",
+      Dec: "Case studies (Instagram, TinyURL)"
+    }
+  },
+  {
+    id: "projects",
+    title: "Projects & Development Skills",
+    checklist: [
+      "Polish 2 existing projects & deploy",
+      "Build 1 new production-quality project",
+      "Web Dev: HTML, CSS, JS, React, Node.js",
+      "Cloud basics: Docker, AWS/GCP, CI/CD"
+    ],
+    milestones: {
+      Sept: "Polish old projects",
+      Oct: "Web dev skills + start new project",
+      Nov: "Cloud deployment",
+      Dec: "Finalize + documentation"
+    }
+  },
+  {
+    id: "ml",
+    title: "Machine Learning Foundations",
+    checklist: [
+      "Regression, Classification, Clustering, PCA",
+      "DL: CNN, RNN/LSTM, Transformers, Attention",
+      "Optimization: GA, PSO, ACO, HLO",
+      "Deliverables: 2 ML projects deployed, 1 research draft"
+    ],
+    milestones: {
+      Sept: "ML basics",
+      Oct: "Deep Learning (CNN, RNN)",
+      Nov: "Transformers + Optimization",
+      Dec: "Projects + research draft"
+    }
+  },
+  {
+    id: "mlsystemdesign",
+    title: "ML System Design",
+    checklist: [
+      "Data pipelines & feature stores",
+      "Model deployment & monitoring",
+      "Design recommendation system",
+      "Real-time sentiment analysis, ranking systems"
+    ],
+    milestones: {
+      Sept: "Data pipelines",
+      Oct: "Feature stores + deployment",
+      Nov: "Recommendation system",
+      Dec: "Sentiment + ranking"
+    }
+  },
+  {
+    id: "resume",
+    title: "Resume & Profile Building",
+    checklist: [
+      "Rewrite resume FAANG-style",
+      "Pin 3–4 projects on GitHub",
+      "Optimize LinkedIn (headline, about, featured)",
+      "Portfolio website by Oct"
+    ],
+    milestones: {
+      Sept: "Resume draft",
+      Oct: "Portfolio + LinkedIn",
+      Nov: "GitHub cleanup",
+      Dec: "Final polish"
+    }
+  },
+  {
+    id: "mock",
+    title: "Mock Interviews & HR Prep",
+    checklist: [
+      "Weekly mock coding (DSA + system design)",
+      "ML interview Qs: theory + applied",
+      "HR prep: STAR method",
+      "Monthly confidence review"
+    ],
+    milestones: {
+      Sept: "Mock basics",
+      Oct: "System design mocks",
+      Nov: "ML mocks",
+      Dec: "HR + final review"
+    }
+  },
+  {
+    id: "python",
+    title: "Python Programming (ML-focused)",
+    checklist: [
+      "Basics: syntax, loops, functions",
+      "DSA in Python: lists, dicts, sets, recursion",
+      "OOP in Python: classes, inheritance, polymorphism",
+      "NumPy & Pandas practice",
+      "Visualization: Matplotlib & Seaborn",
+      "Scikit-learn ML problems",
+      "TensorFlow/Keras basics",
+      "Advanced: Generators, Decorators, Multiprocessing"
+    ],
+    milestones: {
+      Sept: "Core Python + DSA",
+      Oct: "OOP + NumPy, Pandas, Matplotlib",
+      Nov: "Scikit-learn projects",
+      Dec: "Deep Learning mini-project"
+    }
+  }
+];
+
+const tabsDiv = document.getElementById("tabs");
+const contentsDiv = document.getElementById("tab-contents");
+
+threads.forEach((t, index) => {
+  const btn = document.createElement("button");
+  btn.textContent = t.title;
+  btn.onclick = () => showTab(t.id);
+  btn.id = "tab-btn-" + t.id;
+  if (index === 0) btn.classList.add("active");
+  tabsDiv.appendChild(btn);
+
+  const div = document.createElement("div");
+  div.className = "tab-content" + (index === 0 ? " active" : "");
+  div.id = "tab-" + t.id;
+
+  div.innerHTML = `
+    <div class="card">
+      <h2>${t.title}</h2>
+      <div class="progress-container">
+        <div class="progress-bar" id="progress-${t.id}"></div>
+      </div>
+      <ul>
+        ${t.checklist.map((item, i) =>
+          `<li><input type="checkbox" onchange="updateProgress('${t.id}')" id="${t.id}-chk-${i}"> ${item}</li>`
+        ).join("")}
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Milestones (Sept–Dec)</h3>
+      <ul>
+        ${Object.entries(t.milestones).map(([month, goal]) =>
+          `<li><strong>${month}:</strong> ${goal}</li>`
+        ).join("")}
+      </ul>
+    </div>
+  `;
+  contentsDiv.appendChild(div);
+
+  // restore saved checkbox states
+  t.checklist.forEach((_, i) => {
+    const key = `${t.id}-chk-${i}`;
+    const saved = localStorage.getItem(key);
+    if (saved === "true") {
+      document.getElementById(key).checked = true;
+    }
+  });
+  updateProgress(t.id);
+});
+
+function showTab(id) {
+  document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + id).classList.add("active");
+  document.getElementById("tab-btn-" + id).classList.add("active");
+}
+
+function updateProgress(id) {
+  const checkboxes = document.querySelectorAll(`#tab-${id} input[type=checkbox]`);
+  const total = checkboxes.length;
+  let checked = 0;
+  checkboxes.forEach((c, i) => {
+    if (c.checked) {
+      checked++;
+      localStorage.setItem(`${id}-chk-${i}`, "true");
+    } else {
+      localStorage.setItem(`${id}-chk-${i}`, "false");
+    }
+  });
+  const percent = (checked / total) * 100;
+  document.getElementById("progress-" + id).style.width = percent + "%";
+}
+</script>
+
+</body>
+</html>
